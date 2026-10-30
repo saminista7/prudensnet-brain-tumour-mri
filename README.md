@@ -102,6 +102,28 @@ Where they differ, the code is what actually produced the numbers.
 | Precision | mixed_float16 policy | not enabled, float32 throughout |
 | Seeds | results across multiple random seeds, mean and std | the headline notebook is a single run, seed 42 |
 
+## Three more things an auditor will find
+
+- The headline run's source folders held exactly 1,400 images per class
+  (collected + duplicate-skipped = 1,400 for all four), 5,600 in total. The
+  canonical Kaggle Training folder has 5,712 with uneven classes, so the run
+  read a rebalanced re-upload, not the original layout. Whether its images
+  otherwise match the canonical set cannot be told from the notebook.
+- Two rows of the baseline table do not trace cleanly to the notebooks.
+  EfficientFormerV2-S0 printed 99.38% in its notebook but appears as 0.9638
+  in Table 2, and FocalNet Tiny and VAN-B0 carry identical accuracy and loss
+  (0.7817 / 0.5984); the FocalNet run is labelled "or fallback" in its own
+  notebook, so the two rows likely describe overlapping runs. Table 2's
+  caption also says "all ~1.4M params" while Table 4 of the same paper lists
+  the baselines' real total sizes, 2.4M to 70M.
+- In the complexity table, PruDensNet's peak memory was measured through
+  TensorFlow and the baselines' through PyTorch, so that column is not
+  comparable across rows.
+
+`prudensnet.py` has been run under TensorFlow 2.22: it builds, and its
+assertions confirm 1,130,382 trainable parameters without the pad and
+1,461,587 with it.
+
 ## Files
 
 - `notebooks/` holds the executed Kaggle notebooks exactly as they ran, outputs
